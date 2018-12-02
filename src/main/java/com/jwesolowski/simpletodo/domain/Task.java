@@ -7,7 +7,8 @@ public class Task implements GenericEntity<Task> {
   private long id;
   private String description;
   private String name;
-  private LocalDateTime due;
+  private Reminders reminders;
+  private Priority priority;
   private boolean completed;
 
   @Override

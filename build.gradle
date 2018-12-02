@@ -1,2 +1,7 @@
+
+plugins {
+    id "org.springframework.boot" version "2.1.0.RELEASE"
+}
+
 apply plugin: 'idea'
 apply plugin: 'java'
