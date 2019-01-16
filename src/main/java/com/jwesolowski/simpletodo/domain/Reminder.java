@@ -1,35 +1,33 @@
 package com.jwesolowski.simpletodo.domain;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "PROJECT")
-public class Project implements GenericEntity<Project> {
+@Table(name = "REMINDERS")
+public class Reminder implements GenericEntity<Reminder> {
 
   @Id
   @Column(name = "ID")
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PROJECT_SEQ")
-  @SequenceGenerator(name = "PROJECT_SEQ", sequenceName = "PROJECT_SEQ", allocationSize = 1)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REMINDER_SEQ")
+  @SequenceGenerator(name = "REMINDER_SEQ", sequenceName = "REMINDER_SEQ", allocationSize = 1)
   private Long id;
 
-  @OneToMany(mappedBy = "project")
-  private List<Task> tasks = new ArrayList<>();
+  @Column(name = "ALARM")
+  private LocalDateTime alarm;
 
   @ManyToOne
-  @JoinColumn(name = "user_id")
-  private User user;
-
+  @JoinColumn(name = "task_id")
+  private Task task;
 
   @Override
   public long getId() {

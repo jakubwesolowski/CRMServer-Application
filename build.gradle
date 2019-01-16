@@ -16,7 +16,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 bootJar {
-    mainClassName = 'pl.edu.wat.wcy.mwsi.runner.ApplicationRunner'
+    mainClassName = 'com.jwesolowski.simpletodo.runner.ApplicaionRunner'
 }
 
 jar {
