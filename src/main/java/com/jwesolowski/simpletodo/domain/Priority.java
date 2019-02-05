@@ -1,5 +1,5 @@
 package com.jwesolowski.simpletodo.domain;
 
 public enum Priority {
-  URGENT
+  LOW, MINOR, MODERATE, SIGNIFICANT, REQUIRED
 }

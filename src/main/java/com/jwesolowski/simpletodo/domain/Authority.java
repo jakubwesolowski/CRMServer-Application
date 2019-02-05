@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "AUTHORITY")
-public class Authority {
+public class Authority implements GenericEntity<Authority> {
 
   @Id
   @Column(name = "ID")

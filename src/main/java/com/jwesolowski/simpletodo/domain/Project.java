@@ -2,13 +2,13 @@ package com.jwesolowski.simpletodo.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -23,16 +23,49 @@ public class Project implements GenericEntity<Project> {
   @SequenceGenerator(name = "PROJECT_SEQ", sequenceName = "PROJECT_SEQ", allocationSize = 1)
   private Long id;
 
-  @OneToMany(mappedBy = "project")
+  @OneToMany(mappedBy = "projectId", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private List<Task> tasks = new ArrayList<>();
 
-  @ManyToOne
-  @JoinColumn(name = "user_id")
-  private User user;
+  @Column(name = "PROJECT_NAME")
+  private String name;
 
+  @Column(name = "USER_ID")
+  private Long userId;
 
   @Override
-  public long getId() {
+  public Long getId() {
     return id;
+  }
+
+  public void addTask(Task task) {
+    tasks.add(task);
+  }
+
+  public List<Task> getTasks() {
+    return tasks;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public void setTasks(List<Task> tasks) {
+    this.tasks = tasks;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public Long getUserId() {
+    return userId;
+  }
+
+  public void setUserId(Long userId) {
+    this.userId = userId;
   }
 }

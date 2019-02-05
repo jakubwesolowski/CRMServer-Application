@@ -2,8 +2,10 @@ package com.jwesolowski.simpletodo.domain;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -41,8 +43,8 @@ public class User implements GenericEntity<User> {
   @Size(min = 4, max = 100)
   private String password;
 
-  @OneToMany(mappedBy = "user")
-  private List<Project> tasks = new ArrayList<>();
+  @OneToMany(mappedBy = "userId", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private List<Project> projects = new ArrayList<>();
 
   @Column(name = "ENABLED")
   @NotNull
@@ -73,7 +75,7 @@ public class User implements GenericEntity<User> {
       name = "USER_AUTHORITY",
       joinColumns = {@JoinColumn(name = "USER_ID", referencedColumnName = "ID")},
       inverseJoinColumns = {@JoinColumn(name = "AUTHORITY_ID", referencedColumnName = "ID")})
-  private Set<Authority> authorities;
+  private Set<Authority> authorities = new HashSet<>();
 
   public void setId(Long id) {
     this.id = id;
@@ -119,14 +121,6 @@ public class User implements GenericEntity<User> {
     this.password = password;
   }
 
-  public List<Project> getTasks() {
-    return tasks;
-  }
-
-  public void setTasks(List<Project> tasks) {
-    this.tasks = tasks;
-  }
-
   public Boolean getEnabled() {
     return enabled;
   }
@@ -152,7 +146,19 @@ public class User implements GenericEntity<User> {
   }
 
   @Override
-  public long getId() {
+  public Long getId() {
     return id;
+  }
+
+  public List<Project> getProjects() {
+    return projects;
+  }
+
+  public void setProjects(List<Project> projects) {
+    this.projects = projects;
+  }
+
+  public void addProject(Project project) {
+    projects.add(project);
   }
 }

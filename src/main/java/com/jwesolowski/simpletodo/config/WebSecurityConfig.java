@@ -41,6 +41,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Value("${jwt.route.authentication.path}")
   private String authenticationPath;
 
+  @Value("/register")
+  private String registerPath;
+
   @Autowired
   public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
     auth
@@ -62,6 +65,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity httpSecurity) throws Exception {
     httpSecurity
+        .cors().and()
         // we don't need CSRF because our token is invulnerable
         .csrf().disable()
 
@@ -74,8 +78,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         // Un-secure H2 Database
         .antMatchers("/h2/**/**").permitAll()
-
         .antMatchers("/auth/**").permitAll()
+        .antMatchers("/register/**").permitAll()
         .anyRequest().authenticated();
 
     httpSecurity
@@ -95,7 +99,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .ignoring()
         .antMatchers(
             HttpMethod.POST,
-            authenticationPath
+            authenticationPath,
+            registerPath
         )
 
         // allow anonymous resource requests

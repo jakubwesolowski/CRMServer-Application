@@ -1,9 +1,13 @@
 package com.jwesolowski.simpletodo.security.controller;
 
+import com.jwesolowski.simpletodo.domain.User;
+import com.jwesolowski.simpletodo.repository.UserRepository;
 import com.jwesolowski.simpletodo.security.JwtAuthenticationRequest;
+import com.jwesolowski.simpletodo.security.JwtRegisterRequest;
 import com.jwesolowski.simpletodo.security.JwtTokenUtil;
 import com.jwesolowski.simpletodo.security.JwtUser;
 import com.jwesolowski.simpletodo.security.service.JwtAuthenticationResponse;
+import java.util.Date;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +21,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,6 +35,12 @@ public class AuthenticationRestController {
 
   @Value("${jwt.header}")
   private String tokenHeader;
+
+  @Autowired
+  private PasswordEncoder encoder;
+
+  @Autowired
+  private UserRepository userRepository;
 
   @Autowired
   private AuthenticationManager authenticationManager;
@@ -54,8 +65,31 @@ public class AuthenticationRestController {
     final String token = jwtTokenUtil.generateToken(userDetails);
 
     // Return the token
-    return ResponseEntity.ok(new JwtAuthenticationResponse(token));
+    return ResponseEntity
+        .ok(new JwtAuthenticationResponse(authenticationRequest.getUsername(), token));
   }
+
+  @RequestMapping(value = "${jwt.route.authentication.register}", method = RequestMethod.POST)
+  public ResponseEntity<?> register(
+      @RequestBody JwtRegisterRequest registerRequest) throws AuthenticationException {
+
+    if (userRepository.existsByUsername(registerRequest.getUsername())) {
+      return new ResponseEntity<>("User with this name already exist", HttpStatus.BAD_REQUEST);
+    }
+
+    User user = new User();
+    user.setUsername(registerRequest.getUsername());
+    user.setPassword(encoder.encode(registerRequest.getPassword()));
+    user.setEnabled(true);
+    user.setLastPasswordResetDate(new Date());
+    user.setFirstname(registerRequest.getFirstName());
+    user.setLastname(registerRequest.getLastName());
+    user.setEmail(registerRequest.getEmail());
+
+    userRepository.save(user);
+    return new ResponseEntity<>("User created!", HttpStatus.CREATED);
+  }
+
 
   @RequestMapping(value = "${jwt.route.authentication.refresh}", method = RequestMethod.GET)
   public ResponseEntity<?> refreshAndGetAuthenticationToken(HttpServletRequest request) {
@@ -66,7 +100,7 @@ public class AuthenticationRestController {
 
     if (jwtTokenUtil.canTokenBeRefreshed(token, user.getLastPasswordResetDate())) {
       String refreshedToken = jwtTokenUtil.refreshToken(token);
-      return ResponseEntity.ok(new JwtAuthenticationResponse(refreshedToken));
+      return ResponseEntity.ok(new JwtAuthenticationResponse(user.getUsername(), refreshedToken));
     } else {
       return ResponseEntity.badRequest().body(null);
     }
@@ -87,7 +121,7 @@ public class AuthenticationRestController {
 
     try {
 
-      System.out.println("Username: " + "password: " + password);
+      System.out.println("Username: " + username + " password: " + password);
 
       authenticationManager
           .authenticate(new UsernamePasswordAuthenticationToken(username, password));
