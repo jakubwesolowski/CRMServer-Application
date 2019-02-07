@@ -69,7 +69,7 @@ public class TaskServiceImpl implements TaskService {
   @Override
   public Task addTaskToProject(Task task, Long projectId) {
 
-    task.addReminder(newReminder(task.getId()));
+//    task.addReminder(newReminder(task.getId()));
     task.setProjectId(projectId);
     return taskRepository.save(task);
   }
@@ -96,9 +96,9 @@ public class TaskServiceImpl implements TaskService {
       task.setProjectId(newInboxId);
     }
 
-    task.addReminder(newReminder(task.getId()));
-    System.out.print("reminders in addTask Service  ");
-    task.getReminders().stream().map(Reminder::getTaskId).forEach(System.out::println);
+//    task.addReminder(newReminder(task.getId()));
+//    System.out.print("reminders in addTask Service  ");
+//    task.getReminders().stream().map(Reminder::getTaskId).forEach(System.out::println);
 
     return taskRepository.save(task);
   }
