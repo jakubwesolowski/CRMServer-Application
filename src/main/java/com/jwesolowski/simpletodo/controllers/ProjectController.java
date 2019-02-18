@@ -1,7 +1,6 @@
 package com.jwesolowski.simpletodo.controllers;
 
 import com.jwesolowski.simpletodo.domain.Project;
-import com.jwesolowski.simpletodo.domain.User;
 import com.jwesolowski.simpletodo.service.ProjectService;
 import com.jwesolowski.simpletodo.service.UserService;
 import java.util.List;

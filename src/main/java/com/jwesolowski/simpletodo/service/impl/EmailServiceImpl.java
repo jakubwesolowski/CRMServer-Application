@@ -69,7 +69,6 @@ public class EmailServiceImpl implements EmailService {
           body = stringWriter.toString();
         }
 
-
         final Email email = DefaultEmail.builder()
             .from(new InternetAddress("simpletodopz@gmail.com"))
             .to(Lists.newArrayList(new InternetAddress(user.getEmail())))
@@ -104,8 +103,17 @@ public class EmailServiceImpl implements EmailService {
   }
 
   @Override
-  public void sendRegisterEmail() {
+  public void sendRegisterEmail(User user) throws AddressException {
 
+    final Email email = DefaultEmail.builder()
+        .from(new InternetAddress("simpletodopz@gmail.com"))
+        .to(Lists.newArrayList(new InternetAddress(user.getEmail())))
+        .subject("SimpleTodo registration")
+        .body("Thank you for registering " + user.getFirstname() + " " + user.getLastname()
+            + "\nHave a nice day!")
+        .encoding(String.valueOf(Charset.forName("UTF-8"))).build();
+
+    emailService.send(email);
   }
 
   @Scheduled(cron = "${dailyTime}")

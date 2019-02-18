@@ -9,8 +9,10 @@ import com.jwesolowski.simpletodo.security.JwtRegisterRequest;
 import com.jwesolowski.simpletodo.security.JwtTokenUtil;
 import com.jwesolowski.simpletodo.security.JwtUser;
 import com.jwesolowski.simpletodo.security.service.JwtAuthenticationResponse;
+import com.jwesolowski.simpletodo.service.EmailService;
 import java.util.Date;
 import java.util.Objects;
+import javax.mail.internet.AddressException;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,6 +42,9 @@ public class AuthenticationRestController {
 
   @Autowired
   private PasswordEncoder encoder;
+
+  @Autowired
+  private EmailService emailService;
 
   @Autowired
   private UserRepository userRepository;
@@ -79,8 +84,14 @@ public class AuthenticationRestController {
       @RequestBody JwtRegisterRequest registerRequest) throws AuthenticationException {
 
     if (userRepository.existsByUsername(registerRequest.getUsername())) {
-//      return new ResponseEntity<>("User with this name already exist", HttpStatus.BAD_REQUEST);
-      return ResponseEntity.status(HttpStatus.CONFLICT).body("User with this name already exist");
+      return ResponseEntity.status(HttpStatus.CONFLICT).body("User with this name already exists!");
+    }
+
+    if (userRepository.existsByUsername(registerRequest.getUsername()) || userRepository.findAll()
+        .stream().anyMatch(user -> user.getEmail().equals(registerRequest.getEmail()))) {
+
+      return ResponseEntity.status(HttpStatus.CONFLICT)
+          .body("User with this email already exists!");
     }
 
     User user = new User();
@@ -100,7 +111,12 @@ public class AuthenticationRestController {
     proj.setUser(user);
     projectRepository.saveAndFlush(proj);
 
-//    return new ResponseEntity<>("User created!", HttpStatus.CREATED);
+    try {
+      emailService.sendRegisterEmail(user);
+    } catch (AddressException e) {
+      e.printStackTrace();
+    }
+
     return ResponseEntity.status(HttpStatus.OK).body("User created!");
   }
 
@@ -133,9 +149,6 @@ public class AuthenticationRestController {
     Objects.requireNonNull(password);
 
     try {
-
-      System.out.println("Username: " + username + " password: " + password);
-
       authenticationManager
           .authenticate(new UsernamePasswordAuthenticationToken(username, password));
 

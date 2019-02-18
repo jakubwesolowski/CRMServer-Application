@@ -1,16 +1,15 @@
 package com.jwesolowski.simpletodo.service;
 
-import java.io.UnsupportedEncodingException;
+import com.jwesolowski.simpletodo.domain.User;
 import javax.mail.internet.AddressException;
-import org.springframework.mail.SimpleMailMessage;
 
 public interface EmailService {
 
-  boolean removeDailyMessages(String username) throws UnsupportedEncodingException, AddressException;
+  boolean removeDailyMessages(String username);
 
-  boolean setDailyMessages(String username) throws UnsupportedEncodingException, AddressException;
+  boolean setDailyMessages(String username);
 
   boolean getDaily(String name);
 
-  void sendRegisterEmail();
+  void sendRegisterEmail(User user) throws AddressException;
 }

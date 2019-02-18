@@ -18,7 +18,7 @@ public class EmailController {
   private EmailService emailService;
 
   @RequestMapping("/email/send/getDaily")
-  public boolean getDaily() throws UnsupportedEncodingException, AddressException {
+  public boolean getDaily() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     return emailService.getDaily(authentication.getName());
   }

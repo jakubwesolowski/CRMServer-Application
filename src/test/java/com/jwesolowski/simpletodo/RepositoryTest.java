@@ -1,6 +1,6 @@
 package com.jwesolowski.simpletodo;
 
-public class RepositoryTest {
+class RepositoryTest {
 
 
 

@@ -46,7 +46,7 @@ public class User implements GenericEntity<User> {
 
   @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
   @JsonManagedReference
-  private List<Project> projects = new ArrayList<>();
+  private final List<Project> projects = new ArrayList<>();
 
   @Column(name = "enabled")
   @NotNull
