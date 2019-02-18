@@ -16,11 +16,9 @@ public class ReminderServiceImpl implements ReminderService {
 
   @Override
   public List<Reminder> getTaskReminders(Long taskId) {
-    reminderRepository.findAll().stream().map(Reminder::getTaskId)
-        .forEach(System.out::println);
 
     return reminderRepository.findAll().stream()
-        .filter(reminder -> reminder.getTaskId().equals(taskId))
+        .filter(reminder -> reminder.getTask().getId().equals(taskId))
         .collect(Collectors.toList());
   }
 }

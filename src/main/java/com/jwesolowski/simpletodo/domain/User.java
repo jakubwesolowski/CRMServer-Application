@@ -1,5 +1,6 @@
 package com.jwesolowski.simpletodo.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -23,52 +24,56 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@Entity
-@Table(name = "USER")
+@Entity(name = "User")
+@Table(name = "user")
 public class User implements GenericEntity<User> {
 
   @Id
-  @Column(name = "ID")
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USER_SEQ")
-  @SequenceGenerator(name = "USER_SEQ", sequenceName = "USER_SEQ", allocationSize = 1)
+  @Column(name = "id")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
+  @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
   private Long id;
 
-  @Column(name = "USERNAME", length = 50, unique = true)
+  @Column(name = "username", length = 50, unique = true)
   @NotNull
   @Size(min = 4, max = 50)
   private String username;
 
-  @Column(name = "PASSWORD", length = 100)
+  @Column(name = "password", length = 100)
   @NotNull
   @Size(min = 4, max = 100)
   private String password;
 
-  @OneToMany(mappedBy = "userId", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+  @JsonManagedReference
   private List<Project> projects = new ArrayList<>();
 
-  @Column(name = "ENABLED")
+  @Column(name = "enabled")
   @NotNull
   private Boolean enabled;
 
-  @Column(name = "LASTPASSWORDRESETDATE")
+  @Column(name = "lastpasswordresetdate")
   @Temporal(TemporalType.TIMESTAMP)
   @NotNull
   private Date lastPasswordResetDate;
 
-  @Column(name = "FIRSTNAME", length = 50)
+  @Column(name = "firstname", length = 50)
   @NotNull
-  @Size(min = 4, max = 50)
+  @Size(min = 2, max = 50)
   private String firstname;
 
-  @Column(name = "LASTNAME", length = 50)
+  @Column(name = "lastname", length = 50)
   @NotNull
-  @Size(min = 4, max = 50)
+  @Size(min = 2, max = 50)
   private String lastname;
 
-  @Column(name = "EMAIL", length = 50)
+  @Column(name = "email", length = 50)
   @NotNull
   @Size(min = 4, max = 50)
   private String email;
+
+  @Column(name = "daily", length = 50)
+  private Boolean sendDaily = false;
 
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
@@ -154,11 +159,21 @@ public class User implements GenericEntity<User> {
     return projects;
   }
 
-  public void setProjects(List<Project> projects) {
-    this.projects = projects;
-  }
-
   public void addProject(Project project) {
     projects.add(project);
+    project.setUser(this);
+  }
+
+  public void removeProject(Project project) {
+    projects.remove(project);
+    project.setUser(null);
+  }
+
+  public Boolean getSendDaily() {
+    return sendDaily;
+  }
+
+  public void setSendDaily(Boolean sendDaily) {
+    this.sendDaily = sendDaily;
   }
 }

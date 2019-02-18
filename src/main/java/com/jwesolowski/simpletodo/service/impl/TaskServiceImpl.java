@@ -25,10 +25,10 @@ public class TaskServiceImpl implements TaskService {
   private TaskRepository taskRepository;
 
   @Autowired
-  private UserRepository userRepository;
+  private ReminderRepository reminderRepository;
 
   @Autowired
-  private ReminderRepository reminderRepository;
+  private UserRepository userRepository;
 
   @Autowired
   private ProjectRepository projectRepository;
@@ -50,7 +50,6 @@ public class TaskServiceImpl implements TaskService {
         .getProjects()
         .stream()
         .flatMap(e -> e.getTasks().stream())
-//        .filter(task -> task.getReminders().get(0).getAlarm().toLocalDate().equals(LocalDate.now()))
         .filter(task -> task.getReminders().get(0).getDate().equals(LocalDate.now()))
         .collect(Collectors.toList());
   }
@@ -69,67 +68,60 @@ public class TaskServiceImpl implements TaskService {
   @Override
   public Task addTaskToProject(Task task, Long projectId) {
 
-//    task.addReminder(newReminder(task.getId()));
-    task.setProjectId(projectId);
-    return taskRepository.save(task);
+    Optional<Project> maybeProject = projectRepository.findById(projectId);
+
+    if (maybeProject.isPresent()) {
+      Project project = maybeProject.get();
+      task.setProject(project);
+      Task t = taskRepository.saveAndFlush(task);
+
+      Reminder reminder = new Reminder();
+      reminder.setTask(t);
+      reminderRepository.saveAndFlush(reminder);
+      return taskRepository.saveAndFlush(task);
+
+    } else {
+//      return addTask(task);
+      return null;
+    }
   }
 
   @Override
   public Task addTask(Task task) {
 
-    Optional<Project> maybeInbox = projectRepository.findAll().stream()
-        .filter(project -> project.getName().equals("Inbox")).findAny();
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    User user = userRepository.getByUsername(authentication.getName());
 
-    if (maybeInbox.isPresent()) {
-      task.setProjectId(maybeInbox.get().getId());
+    Project project = user.getProjects().stream()
+        .filter(p -> p.getName().equals("Inbox")).findAny().get();
 
-    } else {
+    task.setProject(project);
+    Task t = taskRepository.saveAndFlush(task);
 
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      User user = userRepository.getByUsername(authentication.getName());
+    Reminder reminder = new Reminder();
+    reminder.setTask(t);
+    reminderRepository.saveAndFlush(reminder);
+    return taskRepository.saveAndFlush(task);
 
-      Project newInbox = new Project();
-      newInbox.setUserId(user.getId());
-      newInbox.setName("Inbox");
-      Long newInboxId = projectRepository.save(newInbox).getId();
-
-      task.setProjectId(newInboxId);
-    }
-
-//    task.addReminder(newReminder(task.getId()));
-//    System.out.print("reminders in addTask Service  ");
-//    task.getReminders().stream().map(Reminder::getTaskId).forEach(System.out::println);
-
-    return taskRepository.save(task);
   }
 
   @Override
-  public boolean completeTask(Long taskId) {
+  public Task updateTask(Task task, Long projectId) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    User user = userRepository.getByUsername(authentication.getName());
 
-    Optional<Task> maybeTask = taskRepository.findById(taskId);
+//    Reminder r = reminderRepository.findAll().stream()
+//        .filter(reminder -> reminder.getTask().getId().equals(task.getId())).findAny().get();
 
-    if (maybeTask.isPresent()) {
-      Task task = maybeTask.get();
-      task.setCompleted(true);
-      taskRepository.save(task);
-      return true;
-    } else {
-      return false;
-    }
-  }
+    Project p = projectRepository.findById(projectId).get();
 
-  @Override
-  public Task updateTask(Task task) {
-    return taskRepository.save(task);
-  }
+    p.removeTask(task);
+    Project p1 = projectRepository.save(p);
+    Task t1 = taskRepository.save(task);
+    p1.addTask(t1);
+    Project p2 = projectRepository.save(p1);
+    t1.setProject(p2);
+    return taskRepository.save(t1);
 
-  public Reminder newReminder(Long taskId) {
-
-    Reminder newReminder = new Reminder();
-    newReminder.setTaskId(taskId);
-    System.out.println("Before orm " + newReminder.getTaskId());
-    Reminder fromOrm = reminderRepository.save(newReminder);
-    System.out.println("From orm task id " + fromOrm.getTaskId());
-    return fromOrm;
   }
 }

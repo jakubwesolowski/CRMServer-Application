@@ -9,4 +9,5 @@ public interface ProjectService {
 
   List<Project> getProjectByUsername(String username);
 
+  Project updateProject(Project project);
 }

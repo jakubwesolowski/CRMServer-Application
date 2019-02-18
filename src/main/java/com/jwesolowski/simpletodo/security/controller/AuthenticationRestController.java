@@ -1,6 +1,8 @@
 package com.jwesolowski.simpletodo.security.controller;
 
+import com.jwesolowski.simpletodo.domain.Project;
 import com.jwesolowski.simpletodo.domain.User;
+import com.jwesolowski.simpletodo.repository.ProjectRepository;
 import com.jwesolowski.simpletodo.repository.UserRepository;
 import com.jwesolowski.simpletodo.security.JwtAuthenticationRequest;
 import com.jwesolowski.simpletodo.security.JwtRegisterRequest;
@@ -43,6 +45,9 @@ public class AuthenticationRestController {
   private UserRepository userRepository;
 
   @Autowired
+  private ProjectRepository projectRepository;
+
+  @Autowired
   private AuthenticationManager authenticationManager;
 
   @Autowired
@@ -70,11 +75,12 @@ public class AuthenticationRestController {
   }
 
   @RequestMapping(value = "${jwt.route.authentication.register}", method = RequestMethod.POST)
-  public ResponseEntity<?> register(
+  public ResponseEntity<String> register(
       @RequestBody JwtRegisterRequest registerRequest) throws AuthenticationException {
 
     if (userRepository.existsByUsername(registerRequest.getUsername())) {
-      return new ResponseEntity<>("User with this name already exist", HttpStatus.BAD_REQUEST);
+//      return new ResponseEntity<>("User with this name already exist", HttpStatus.BAD_REQUEST);
+      return ResponseEntity.status(HttpStatus.CONFLICT).body("User with this name already exist");
     }
 
     User user = new User();
@@ -87,9 +93,16 @@ public class AuthenticationRestController {
     user.setEmail(registerRequest.getEmail());
 
     userRepository.save(user);
-    return new ResponseEntity<>("User created!", HttpStatus.CREATED);
-  }
 
+    Project newInbox = new Project();
+    newInbox.setName("Inbox");
+    Project proj = projectRepository.saveAndFlush(newInbox);
+    proj.setUser(user);
+    projectRepository.saveAndFlush(proj);
+
+//    return new ResponseEntity<>("User created!", HttpStatus.CREATED);
+    return ResponseEntity.status(HttpStatus.OK).body("User created!");
+  }
 
   @RequestMapping(value = "${jwt.route.authentication.refresh}", method = RequestMethod.GET)
   public ResponseEntity<?> refreshAndGetAuthenticationToken(HttpServletRequest request) {

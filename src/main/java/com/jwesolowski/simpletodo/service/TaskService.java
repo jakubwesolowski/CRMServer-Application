@@ -15,7 +15,5 @@ public interface TaskService {
 
   Task addTask(Task task);
 
-  boolean completeTask(Long taskId);
-
-  Task updateTask(Task task);
+  Task updateTask(Task task, Long projectId);
 }

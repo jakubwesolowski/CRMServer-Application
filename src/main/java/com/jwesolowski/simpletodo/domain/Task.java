@@ -1,5 +1,8 @@
 package com.jwesolowski.simpletodo.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -11,40 +14,45 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-@Entity
-@Table(name = "TASK")
+@Entity(name = "Task")
+@Table(name = "task")
 public class Task implements GenericEntity<Task> {
 
   @Id
-  @Column(name = "ID")
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "TASK_SEQ")
-  @SequenceGenerator(name = "TASK_SEQ", sequenceName = "TASK_SEQ", allocationSize = 1)
+  @Column(name = "id")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "task_seq")
+  @SequenceGenerator(name = "task_seq", sequenceName = "task_seq", allocationSize = 1)
   private Long id;
 
-  @Column(name = "DESCRIPTION")
+  @Column(name = "description")
   private String description;
 
-  @Column(name = "NAME")
+  @Column(name = "name")
   private String name;
 
-  @OneToMany(mappedBy = "taskId", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "task", orphanRemoval = true, cascade = CascadeType.ALL)
+  @JsonManagedReference
   private List<Reminder> reminders = new ArrayList<>();
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "PRIORITY")
+  @Column(name = "priority")
   private Priority priority;
 
-  @Column(name = "COMPLETED")
+  @Column(name = "completed")
   @NotNull
   private boolean completed;
 
-  @Column(name = "PROJECT_ID")
-  private Long projectId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "project_id")
+  @JsonBackReference
+  private Project project;
 
   @Override
   public Long getId() {
@@ -53,6 +61,7 @@ public class Task implements GenericEntity<Task> {
 
   public void addReminder(Reminder reminder) {
     reminders.add(reminder);
+    reminder.setTask(this);
   }
 
   public String getDescription() {
@@ -79,6 +88,11 @@ public class Task implements GenericEntity<Task> {
     this.reminders = reminders;
   }
 
+  public void removeReminder(Reminder reminder) {
+    this.reminders.remove(reminder);
+    reminder.setTask(null);
+  }
+
   public void setPriority(Priority priority) {
     this.priority = priority;
   }
@@ -95,11 +109,27 @@ public class Task implements GenericEntity<Task> {
     this.name = name;
   }
 
-  public Long getProjectId() {
-    return projectId;
+  @Override
+  public int hashCode() {
+    return 32;
   }
 
-  public void setProjectId(Long projectId) {
-    this.projectId = projectId;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Reminder)) {
+      return false;
+    }
+    return id != null && id.equals(((Task) o).id);
+  }
+
+  public Project getProject() {
+    return project;
+  }
+
+  public void setProject(Project project) {
+    this.project = project;
   }
 }

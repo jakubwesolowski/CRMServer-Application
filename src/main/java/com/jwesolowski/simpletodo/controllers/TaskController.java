@@ -4,6 +4,8 @@ import com.jwesolowski.simpletodo.domain.Task;
 import com.jwesolowski.simpletodo.service.TaskService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -44,20 +46,14 @@ public class TaskController {
   }
 
   @RequestMapping("/task/add")
-  public Task addTask(@RequestBody Task task) {
+  public ResponseEntity<Task> addTask(@RequestBody Task task) {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    Task t = taskService.addTask(task);
-    System.out.println("Task with id: " + t.getId() + " has reminder id: " + t.getReminders().get(0).getId());
-    return t;
+    return new ResponseEntity<>(taskService.addTask(task), HttpStatus.OK);
   }
 
-  @RequestMapping("/task/{taskId}/complete")
-  public boolean completeTask(@PathVariable Long taskId) {
-    return taskService.completeTask(taskId);
+  @RequestMapping("/project/{projectId}/task/update")
+  public Task updateTask(@RequestBody Task task, @PathVariable Long projectId) {
+    return taskService.updateTask(task, projectId);
   }
 
-  @RequestMapping("/task/update")
-  public Task updateTask(@RequestBody Task task) {
-    return taskService.updateTask(task);
-  }
 }

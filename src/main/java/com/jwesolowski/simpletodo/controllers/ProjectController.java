@@ -23,22 +23,25 @@ public class ProjectController {
   @Autowired
   private UserService userService;
 
-  @RequestMapping("/addProject")
+  @RequestMapping("/project/add")
   public Project addProject(@RequestBody Project project) {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    User user = userService.getUserFromUsername(authentication.getName());
-    project.setUserId(user.getId());
-//    user.addProject(project);
-//    userService.update(user);
+//    User user = userService.getUserFromUsername(authentication.getName());
+//    project.setUser(user);
     return projectService.addProject(project);
   }
 
-  @RequestMapping("/projects")
+  @RequestMapping("/project/all")
   public List<Project> addProject() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     return projectService.getProjectByUsername(authentication.getName());
-
   }
 
-
+  @RequestMapping("/project/update")
+  public Project updateProject(@RequestBody Project project) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//    User user = userService.getUserFromUsername(authentication.getName());
+//    project.setUser(user);
+    return projectService.updateProject(project);
+  }
 }
