@@ -103,6 +103,11 @@ public class EmailServiceImpl implements EmailService {
     return user.getSendDaily();
   }
 
+  @Override
+  public void sendRegisterEmail() {
+
+  }
+
   @Scheduled(cron = "${dailyTime}")
   @Transactional
   public void scheduleDaily() throws AddressException {

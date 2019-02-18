@@ -36,15 +36,13 @@ dependencies {
     compile group: 'com.rometools', name: 'rome', version: '1.12.0'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.1.1.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.1.1.RELEASE'
-//    compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '2.1.1.RELEASE'
     compile group: 'it.ozimov', name: 'spring-boot-email-core', version: '0.6.3'
     compile 'io.jsonwebtoken:jjwt-api:0.10.5'
+    compile group: 'com.h2database', name: 'h2', version: '1.4.197'
     runtime 'io.jsonwebtoken:jjwt-impl:0.10.5', 'io.jsonwebtoken:jjwt-jackson:0.10.5', 'org.bouncycastle:bcprov-jdk15on:1.60'
-
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.1.1.RELEASE'
     testCompile group: 'org.springframework.security', name: 'spring-security-test', version: '5.1.2.RELEASE'
-    testCompile group: 'com.h2database', name: 'h2', version: '1.4.197'
     testCompile("junit:junit")
 }
 
