@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
+@CrossOrigin(origins = "http://51.145.158.148t:4200", maxAge = 3600)
 public class AuthenticationRestController {
 
   @Value("${jwt.header}")
