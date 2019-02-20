@@ -32,6 +32,7 @@ public class ApplicationRunner {
       public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/register").allowedOrigins("http://localhost:4200");
         registry.addMapping("/auth").allowedOrigins("http://localhost:4200");
+        registry.addMapping("/**/*").allowedOrigins("http://localhost:4200");
       }
     };
   }

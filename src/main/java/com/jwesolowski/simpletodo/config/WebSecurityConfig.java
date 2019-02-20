@@ -89,10 +89,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
     // disable page caching
-    httpSecurity
-        .headers()
-        .frameOptions().sameOrigin()  // required to set for H2 else H2 Console will be blank.
-        .cacheControl();
+//    httpSecurity
+//        .headers()
+//        .frameOptions().sameOrigin()  // required to set for H2 else H2 Console will be blank.
+//        .cacheControl();
+
   }
 
   @Override
@@ -123,6 +124,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .and()
         .ignoring()
         .antMatchers("/h2-console/**/**");
+
   }
 
   @Bean
