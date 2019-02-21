@@ -66,7 +66,13 @@ public class AuthenticationRestController {
   public ResponseEntity<?> createAuthenticationToken(
       @RequestBody JwtAuthenticationRequest authenticationRequest) throws AuthenticationException {
 
-    authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+    try {
+      authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+    } catch (BadCredentialsException e) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).body("Bad credentials!");
+    } catch (DisabledException e) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).body("User is disabled!");
+    }
 
     // Reload password post-security so we can generate the token
     final UserDetails userDetails = userDetailsService
@@ -148,14 +154,7 @@ public class AuthenticationRestController {
     Objects.requireNonNull(username);
     Objects.requireNonNull(password);
 
-    try {
-      authenticationManager
-          .authenticate(new UsernamePasswordAuthenticationToken(username, password));
-
-    } catch (DisabledException e) {
-      throw new AuthenticationException("User is disabled!", e);
-    } catch (BadCredentialsException e) {
-      throw new AuthenticationException("Bad credentials!", e);
-    }
+    authenticationManager
+        .authenticate(new UsernamePasswordAuthenticationToken(username, password));
   }
 }
