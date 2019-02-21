@@ -30,9 +30,9 @@ public class ApplicationRunner {
     return new WebMvcConfigurerAdapter() {
       @Override
       public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/register").allowedOrigins("http://localhost:4200");
-        registry.addMapping("/auth").allowedOrigins("http://localhost:4200");
-        registry.addMapping("/**/*").allowedOrigins("http://localhost:4200");
+        registry.addMapping("/register").allowedOrigins("*");
+        registry.addMapping("/auth").allowedOrigins("*");
+        registry.addMapping("/**/*").allowedOrigins("*");
       }
     };
   }
